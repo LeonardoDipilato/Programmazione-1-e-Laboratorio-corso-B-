@@ -151,5 +151,5 @@ Dato che abbiamo un ASFD, L è regolare.
 Dobbiamo ora trovare una grammatica per descrivere L. L'idea sarebbe di utilizzare, come nell'esercizio 4, un equalizzatore e un destabilizzatore. L'equalizzatore si assicurerà che il numero di a e il numero di b abbiano la stessa parità, mentre il destabilizzatore si occuperà di variare arbitrariamente i due, concentrandosi su solo uno dei due, assicurandosi che non possano più avere la stessa parità. Proviamo quindi:
 
 * S -> aSb | aAb | aBb
-* A -> aaA
-* B -> Bbb
+* A -> aaA | a
+* B -> Bbb | b
