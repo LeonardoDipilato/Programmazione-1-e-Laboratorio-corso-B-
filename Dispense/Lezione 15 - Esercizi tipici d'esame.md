@@ -53,12 +53,9 @@ Tutti i seguenti sono linguaggi su Σ = {a, b} di cui va verificata la regolarit
 
 ## Risoluzione
 ### Numero 1
-Questo esercizio è molto simile a a<sup>k</sup>b<sup>k</sup>, il che ci dà un indizio circa la sua irregolarità. Proviamo, dunque, il Pumping Lemma.
+Questo linguaggio, L = {ba<sup>k</sup>b<sup>k</sup>, k > 0}, è molto simile a a<sup>k</sup>b<sup>k</sup> il che ci dà un indizio circa la sua irregolarità. Proviamo, dunque, il Pumping Lemma.
 
-* "Per qualsiasi n": immaginiamo n arbitrario.
-* "Esiste w appartenente a L, con |w| >= n": prendiamo w = ba<sup>n</sup>b<sup>n</sup> che è lunga 2n+1>=w
-* "Tale che se suddivido w in xyz, con |xy| <= n e y |= ε": scriviamo x = b<sup>g</sup>a<sup>h</sup> (dove 0 <= h < n-1 e g = 0 se n = 1, mentre 1 se n != 1), y = b<sup>1-g</sup>a<sup>t</sup> (dove 0 < t <= n-h) e z = a<sup>k-t-g-h</sup>b<sup>k</sup>.
-* "Esiste una i tale che xy<sup>i</sup>z non appartiene a L": notiamo che se n = 1, abbiamo xy<sup>i</sup>z = b<sup>i*(1-g)</sup>a<sup>k</sup>b<sup>k</sup> = b<sup>i</sup>a<sup>k</sup>b<sup>k</sup>, dato che per n = 1, g = 0. Se n > 1, invece, abbiamo ba<sup>h+i*t</sup>a<sup>k-t-h-1</sup>b<sup>k</sup>. Per i = 0 abbiamo una stringa che non appartiene a L perché ba<sup>k-t-1</sup>b<sup>k</sup>, con t = 1 abbiamo ba<sup>k-2</sup>b<sup>k</sup>.
+Immaginiamo w = ba<sup>n</sup>b<sup>n</sup>. Possiamo spezzare w=xyz con x = ba<sup>s</sup> (con 0 <= s < n), y = a<sup>t</sup> (con 0 < t <= n-s), z = a<sup>n-t-s</sup>b<sup>n</sup>. In tal caso, xy<sup>i</sup>z non appartenente a L significa dire che esiste i tale che s+it+n-t-s != n. Sviluppando ulteriormente abbiamo che t(i-1) != 0 e dato che t != 0 allora i-1 != 0. Basta quindi una qualsiasi i diversa da 1 per far valere le ipotesi del Pumping Lemma.
 
 Abbiamo quindi dimostrato l'irregolarità di L. Per trovare una grammatica che lo definisca, possiamo fare:
 
@@ -84,4 +81,75 @@ Per definire una grammatica potremmo provare a riadattare l'automa:
 * m -> b(2m+1-m)
 * m+1 -> b(m+2)
 * ...
-* 2m-1 -> b
+* 2m-1 -> bz
+
+### Numero 3
+Il linguaggio da studiare, L = {a<sup>k</sup>b<sup>m</sup>, k,m>z>0}, questa volta ha un limite inferiore (z) e due variabili indipendenti fra di loro (k, m). Non è improbabile che il linguaggio sia regolare, perché è possibile immaginare di costruire z stati finiti e mettere un loop sull'ultimo per assicurarsi che k>z e fare lo stesso per m. Proviamo quindi a costruire un ASFD con quest'idea in mente:
+
+* Σ = {a, b}
+* Q = {0, 1, ..., z, z+1, ..., 2z}
+* S = 0
+* F = {2z}
+* δ = {<i, a, i+1>, [dove 0 <= i < z]
+       <z, a, z>,
+       <s, b, s+1>, [dove z <= s < 2z]
+       <2z, b, 2z>}
+
+Il linguaggio è dunque regolare.
+
+Per costruire una grammatica potrei tradurre l'ASFD ottenuto, oppure pensando alla definizione:
+
+S -> AIB
+A -> a<sup>z</sup>
+B -> b<sup>z</sup>
+I -> aI | Ib | ε
+
+S si assicura che ci siano almeno a<sup>z</sup> e b<sup>z</sup>, mentre I permette l'inserimento di a e b in maniera libera al posto giusto, eventualmente nullo.
+
+### Numero 4
+Il linguaggio in questione, L = {a<sup>k</sup>b<sup>m</sup>, k != m}, richiede di sapere quante a siano state messe per assicurarsi di non metterci lo stesso numero di b. Dato che k può essere arbitrariamente grande, dobbiamo per forza ricorrere ad un loop in un ASF per tenerne conto, e di conseguenza perdiamo l'informazione su quante a siano state messe esattamente. Sospettiamo, dunque, che L sia irregolare. E Pumping Lemma sia:
+
+L'idea è di lavorare su un w ancora non finito nella forma a<sup>n</sup>b<sup>f(n)</sup>, dove dobbiamo ancora trovare la funzione f. Se sviluppiamo il lemma da qui abbiamo che x = a<sup>t</sup> (con 0 <= t < n), y = a<sup>s</sup> (con 0 < s <= n-t) e z = a<sup>n-t-s</sup>b<sup>f(n)</sup>. Se andiamo al passaggio successivo, otteniamo che per dimostrare che L sia irregolare dobbiamo poter dire che esiste i tale che t + is + n - t - s == f(n). Sviluppando otteniamo -> i = (f(n) + s - n)/s = (f(n) - n)/s - 1. Dato qui ricaviamo che:
+1. f(n) > n (era anche abbastanza intuitivo dall'inizio, ma qui ne abbiamo la dimostrazione)
+2. f(n) - n deve essere divisibile per s
+
+Giocheremo sul punto due, ma questo significa semplicemente che, visto che s può essere un qualsiasi numero fra 1 e n, che f(n) - n deve essere multiplo di tutti questi. Si potrebbe dire che f(n)-n = n! (dato che n! è il prodotto di tutti i numeri minori o uguali a n). Da qui otteniamo che f(n) = n! + n, che è una funzione pura di n. Abbiamo quindi dimostrato che L è irregolare.
+
+Per trovare una grammatica che lo definisca possiamo pensare a qualcosa che dia due possibilità:
+1. Aggiungere lo stesso numero di a e b ma lasciare in sospeso una risoluzione, in maniera tale da non poterlo utilizzare per chiudere una stringa;
+2. Aggiungere un numero arbitrario o di a o di b, ma rendendo impossibile l'aggiunta di entrambe.
+
+In questo caso, il punto 1 funge da "equalizzatore" (tiene sempre equilibrate le due sezioni) e il secondo punto da "destabilizzatore" (che sposta l'ago della bilancia, di una quantità arbitraria) verso uno dei due estremi. Possiamo quindi pensare a:
+
+S -> aSb | A | B
+A -> aA | a
+B -> Bb | b
+
+### Numero 5
+L = {a<sup>k</sup>b<sup>m</sup>}, (k % 2) != (m % 2) AND k,m >= 0}
+
+La prima cosa da fare, in questo caso, è analizzare il "dominio" di k e m: detto in parole semplici, ciò che è scritto lì è che k ed m devono essere maggiori di zero e non entrambi pari o dispari. Abbiamo imparato che siamo capaci di tener conto di alcuni dati finiti circa le nostre variabili, quindi potremmo pensare di costruire un ASFD che risolva il problema. Prendiamo un problema per volta:
+1. Dobbiamo avere almeno una a: questo significa che nello stato di partenza dovremmo evitare di avere una trasformazione per b.
+2. Dobbiamo tener conto di se a sia pari o dispari: questo è semplice da eseguire tramite un loop di due stati. Inizialmente si potrebbe pensare di andare in loop fra gli stati 0 e 1, ma dato che da 0 non possiamo uscire tramite b per il punto 1 dobbiamo per forza introdurre uno stato 2. D'ora in poi, quindi, quando saremo in 1 significherà che abbiamo un numero dispari di a e quando saremo in 2 significherà che avremo un numero pari di a.
+3. Dobbiamo relazionare b ad a: infatti, non possiamo conservare l'informazione sulla parità di a e analizzare quella di b per poi risolvere il tutto. Quindi significa che uscire dallo stato 1 tramite b o uscirci dallo stato 2 deve portare a due stati diversi, su cui poi andare in loop per trovare la "parità relativa" di b.
+
+Costruiamo quindi:
+* Σ = {a, b}
+* Q = {0, 1, 2, 3, 4}
+* S = 0
+* F = 4
+* δ = {<0, a, 1>,
+       <1, a, 2>,
+       <2, a, 1>,
+       <1, b, 3>,
+       <2, b, 4>,
+       <3, b, 4>,
+       <4, b, 3>}
+
+Dato che abbiamo un ASFD, L è regolare.
+
+Dobbiamo ora trovare una grammatica per descrivere L. L'idea sarebbe di utilizzare, come nell'esercizio 4, un equalizzatore e un destabilizzatore. L'equalizzatore si assicurerà che il numero di a e il numero di b abbiano la stessa parità, mentre il destabilizzatore si occuperà di variare arbitrariamente i due, concentrandosi su solo uno dei due, assicurandosi che non possano più avere la stessa parità. Proviamo quindi:
+
+* S -> aSb | aAb | aBb
+* A -> aaA
+* B -> Bbb
