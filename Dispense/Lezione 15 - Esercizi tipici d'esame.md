@@ -269,7 +269,8 @@ Si trova, facendo un paio di prove, che questo linguaggio può essere schematizz
 2. aabb
 3. una lista qualsiasi di a e b in qualsiasi numero e quantità. a patto che ce ne sia almeno una di uno dei due.
 
-Dato che possiamo rompere il problema in 3 sottoparti, tutte e tre estremamente semplici, è facile dimostrare la regolarità di L tramite un ASFND:
+Risolviamo i 3 problemi singolarmente, visto che non si influenzano in alcuna maniera: abbiamo già usato la notazione Σ* per indicare tutte le possibili combinazioni delle lettere dell'alfabeto Σ, e questa notazione fa esattamente al caso nostro per i punti 1 e 3. Possiamo quindi dire che L = {XaabbY, X,Y appartenenti a Σ*, |Y| > 0}.
+La regolarità di L si dimsotra, invece, tramite un ASFND:
 * Σ = {a, b}
 * Q = {0, 1, 2, 3, 4, 5}
 * S = 0
