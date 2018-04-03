@@ -153,3 +153,134 @@ Dobbiamo ora trovare una grammatica per descrivere L. L'idea sarebbe di utilizza
 * S -> aSb | aAb | aBb
 * A -> aaA | a
 * B -> Bbb | b
+
+### Numero 6
+L = {a<sup>k</sup> | k numero primo} è un caso abbastanza peculiare, ma proprio per questo è abbastanza facile pensare che sia irregolare (anche perché, altrimenti, avremmo un ottimo algoritmo per la ricerca di numeri primi, in quanto basterebbe vedere quali stringhe siano accettate dall'ASF). Proviamo quindi il Pumping Lemma. Data la stringa w=a<sup>f(n)</sup>, dove f(n) è l'n-esimo numero primo. Dato che, per qualsiasi n, f(n) > n, la prima condizione è verificata. A questo punto, dobbiamo solo spezzare w=xyz con x=a<sup>t</sup> (con 0 <= t < n), y=a<sup>s</sup> (con 0 < s <= n-t), z=a<sup>f(n)-t-s</sup>. xy<sup>i</sup>z è quindi a<sup>t+s\*i+n-t-s</sup>=a<sup>n+s\*(i-1)</sup>. Va solo dimostrato che per qualsiasi n ed s, esista un i tale che n+s\*(i-1) non sia primo. Possiamo, ad esempio, dire che n+s\*(i-1) non è primo se è divisibile per n. In tal caso, ci riduciamo a dover dimostare che esista i tale che s\*(i-1) % n == 0. Basta, quindi, scegliere i = n + 1 e avremo tutte le condizioni per il Pumping Lemma, dimostrando che L non è regolare.
+
+## Altri esercizi
+Definire il linguaggio generato dalle seguenti grammatiche sull'alfabeto Σ={a, b, c} con categoria sintattica iniziale S. Per ogni linguaggio, dire se è regolare o meno.
+
+### Numero 1
+* S -> aX
+* X -> bS | b
+
+Provando un paio di esempi, è ovvio come il linguaggio generato sia L = {(ab)<sup>k</sup>, k > 0}. Infatti, ogni volta che abbiamo S, dobbiamo aggiungere ab per forza di cose. Dopo di ciò, potremmo aver terminato (se abbiamo scelto X -> b) oppure ritrovarci un'altra S (che quindi ripeterà il ragionamento).
+
+La regolarità sembra abbastanza scontata, in questo caso, visto che non dobbiamo contare nulla e ci basta attenerci ad un loop. Pensiamo quindi ad un ASFD così fatto:
+
+* Σ = {a, b}
+* Q = {0, 1, 2}
+* S = 0
+* F = {2}
+* δ = {<0, a, 1>, <1, b, 2>, <2, a, 1>}
+
+Dato che abbiamo un ASFD che descrive L, quest'ultimo è regolare.
+
+### Numero 2
+* S -> aS | bB
+* B -> bbB | ccC
+* C -> ccC | cc
+
+Analizzando le strutture notiamo che ci vengono sempre date due possibilità: aggiungere una determinata lettera alla stringa e ripetere oppure aggiungere una lettera diversa da quelle di prima e andare avanti, senza mai aver modo di tornare indietro. Inoltre, possiamo avere un qualsiasi numero di a (eventualmente 0), mentre siamo obbligati ad avere almeno una b e sempre in numero dispari (S -> bB è il destabilizzatore, mentre B -> bbB è l'equalizzatore). Siamo, inoltre, obbligati ad avere almeno 4 c e sempre in numero pari. Questa analisi rende facile la scrittura di L come L = {a<sup>k</sup>b<sup>2m+1</sup>c<sup>2r</sup>, k,m >= 0, r > 1}.
+
+Per la regolarità, ancora una volta, proviamo un ASFD:
+* Σ = {a, b, c}
+* Q = {0, 1, 2, 3, 4, 5, 6}
+* S = 0
+* F = {6}
+* δ = {<0, a, 0>,
+       <0, b, 1>,
+       <1, b, 2>,
+       <2, b, 1>,
+       <1, c, 3>,
+       <3, c, 4>,
+       <4, c, 5>,
+       <5, c, 6>,
+       <6, c, 5>}
+
+### Numero 3
+* S -> ASB | c
+* A -> ab | abA
+* B -> ba | baB
+
+Inizialmente crittico, provando un paio di esempi è chiaro che tipo di stringhe questo linguaggio ammetta. Infatti, ci è sempre assicurato che, da qualche parte nel mezzo, ci sia una c (ed una sola), mentre alla sua sinistra e destra ci possono essere delle ripetizioni, rispettivamente, di ab e ba. In tal caso, L = {(ab)<sup>k</sup>c(ba)<sup>m</sup>, k,m > 0}.
+
+Dato che non ci sono vincoli fra k ed m, è facile aspettarsi la regolarità di L. Proviamo un ASFD:
+
+* Σ = {a, b, c}
+* Q = {0, 1, 2, 3, 4, 5, 6}
+* S = 0
+* F = {6}
+* δ = {<0, a, 1>,
+       <1, b, 2>,
+       <2, a, 1>,
+       <2, c, 3>,
+       <3, b, 4>,
+       <4, a, 5>,
+       <5, b, 6>,
+       <6, a, 5>}
+
+### Numero 4
+* S -> aSc | B
+* B -> aBb | ab
+
+Come prima, abbiamo S che chiama se stesso nel centro dando, come unica opzione, un'opzione che non chiama se stessa. B, di contro, obbliga ad avere una stringa del tipo a<sup>k</sup>b<sup>k</sup> (equalizzatore), destabilizzata da S con una o più a e c ai due estremi. L sarà, quindi, L = {a<sup>k+m</sup>b<sup>k</sup>c<sup>m</sup>, k > 0}.
+
+Dato il legame fra a e b e fra a e c è facile aspettarsi che L sia irregolare. Proviamo quindi il Pumping Lemma: scegliamo la stringa w=a<sup>n+1</sup>bc<sup>n</sup>. Spezzando w=xyz, con x=a<sup>t</sup> (con 0 <= t < n), y=a<sup>s</sup> (con 0 < s <= n-t) e z=a<sup>n+1-t-s</sup>bc<sup>n</sup>, abbiamo che xy<sup>i</sup>z è uguale a a<sup>t+i\*s+n-t-s+1</sup>bc<sup>n</sup>. Ci interessa quindi dire che esista i tale che t+i\*s+n-t-s+1 (il numero di a che troviamo) sia diverso da n+1 (che è il numero di c più il numero di b). Banalmente, n+s\*(i-1)+1 != n+1 per i > 1, ad esempio. L è quindi irregolare.
+
+### Numero 5
+* S -> aABb | ab
+* A -> aC | a
+* B -> Cb | b
+* C -> c
+Prima di analizzare la grammatica, applichiamo un piccolo trucco: visto che C va SOLO in c, senza altre possibilità, possiamo sostituire c con C ovunque esso appaia, ottenendo quindi:
+* S -> aABb | ab
+* A -> ac | a
+* B -> cb | b
+* (si omette c -> c in quanto già utilizzata come informazione).
+
+Dato che A e B vanno in opzioni finite (ovvero senza ricorsione o senza chiamare altre strutture) possiamo pensare di sostituirle in S ottenendo S -> a(ac | a)(cb | b)b | ab.
+
+Da qui si vede immediatamente che L ha esattamente 3 (tecnicamente 4, ma aacbb si ripete due volte) possibili stringhe che possiamo elencare per definire L per elencazione (ovvero scrivendo tutte le possibilità. Abbiamo quindi L = {ab, aacbb, aaccbb}.
+
+Il fatto che L sia un insieme finito implica immediatamente che sia regolare (infatti, essendo L finito è sicuramente scrivibile come un automa a stati FINITI). Per dimostrarlo creiamo, senza assolutamente nessun ragionamento dietro (ovvero, senza semplificare nemmeno le cose più ovvie), un ASFND che descriva L:
+
+* Σ = {a, b, c}
+* Q = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+* S = 0
+* F = {2, 6, 9}
+* δ = {<0, a, 1>,
+       <1, a, 3>,
+       <1, b, 2>,
+       <3, c, 4>,
+       <4, b, 5>,
+       <5, b, 6>,
+       <4, c, 7>,
+       <7, b, 8>,
+       <8, b, 9>}
+
+### Numero 6
+* S -> aS | bS | aaB
+* B -> bbC
+* C -> aC | bC | a | b
+
+Si trova, facendo un paio di prove, che questo linguaggio può essere schematizzato come diviso da 3 parti:
+1. una lista qualsiasi di a e b in qualsiasi numero e quantità (anche nessuna);
+2. aabb
+3. una lista qualsiasi di a e b in qualsiasi numero e quantità. a patto che ce ne sia almeno una di uno dei due.
+
+Dato che possiamo rompere il problema in 3 sottoparti, tutte e tre estremamente semplici, è facile dimostrare la regolarità di L tramite un ASFND:
+* Σ = {a, b}
+* Q = {0, 1, 2, 3, 4, 5}
+* S = 0
+* F = {5}
+* δ = {<0, a, 0>,
+       <0, b, 0>,
+       <0, a, 1>,
+       <1, a, 2>,
+       <2, b, 3>,
+       <3, b, 4>,
+       <4, a, 5>,
+       <4, b, 5>,
+       <5, a, 5>,
+       <5, b, 5>}
